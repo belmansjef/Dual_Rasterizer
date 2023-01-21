@@ -33,3 +33,7 @@
 
 # Temps
 *.vs
+
+TempFiles/
+bin/
+
