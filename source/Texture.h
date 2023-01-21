@@ -10,6 +10,7 @@ namespace dae
 		~Texture();
 
 		ColorRGB SampleColor(const Vector2& uv) const;
+		Vector4 SampleRGBA(const Vector2& uv) const;
 		Vector3 SampleNormal(const Vector2& uv) const;
 
 		ID3D11ShaderResourceView* GetSRV() const;

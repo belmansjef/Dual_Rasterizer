@@ -39,12 +39,37 @@ namespace dae
 		if (FAILED(result))
 			return;
 	}
+
+	Mesh::Mesh(const Mesh& other) noexcept
+	{
+		m_pVertexBuffer = nullptr;
+		m_pIndexBuffer = nullptr;
+
+		m_IsEnabled = other.m_IsEnabled;
+		m_PrimitiveTopology = other.m_PrimitiveTopology;
+		m_CullMode = other.m_CullMode;
+
+		m_pDiffuseMap = other.m_pDiffuseMap;
+		m_pNormalMap = other.m_pNormalMap;
+		m_pSpecularMap = other.m_pSpecularMap;
+		m_pGlossMap = other.m_pGlossMap;
+
+		m_WorldMatrix = other.m_WorldMatrix;
+		m_TranslationMatrix = other.m_TranslationMatrix;
+		m_RotationMatrix = other.m_RotationMatrix;
+
+		m_Indices = other.m_Indices;
+		m_VerticesIn = other.m_VerticesIn;
+		m_VerticesOut = other.m_VerticesOut;
+
+		m_pEffect = other.m_pEffect;
+	}
 #pragma warning ( pop )
 
 	dae::Mesh::~Mesh()
 	{
-		m_pIndexBuffer->Release();
-		m_pVertexBuffer->Release();
+		if(m_pIndexBuffer) m_pIndexBuffer->Release();
+		if(m_pVertexBuffer) m_pVertexBuffer->Release();
 	}
 
 	void dae::Mesh::Update(const Matrix& viewMatrix, const Matrix& projMatrix)

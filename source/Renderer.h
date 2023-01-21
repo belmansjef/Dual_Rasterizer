@@ -44,9 +44,9 @@ namespace dae
 		void RasterizeMesh(Mesh& mesh, const RenderInfo& renderInfo) const;
 
 		Mesh ClipMesh(Mesh& mesh);
-		std::vector<Vector2> ClipTriangle(const std::vector<Vector2>& triVerts);
+		bool ClipTriangle(std::vector<Vector2>& triVerts);
 
-		ColorRGB ShadePixel(const Mesh& mesh, const Vertex_Out& vertex, const RenderInfo& renderInfo) const;
+		ColorRGB ShadePixel(const Mesh& mesh, const Vertex_Out& vertex, const RenderInfo& renderInfo, const ColorRGB& currPixelColor) const;
 
 		// DirectX
 		HRESULT InitializeDirectX();

@@ -133,11 +133,12 @@ namespace dae
 
 		// Software variables
 		ShadingMode shadingMode{ ShadingMode::FinalColor };
-		bool useFastCulling			{ true };
-		bool useClipping			{ false };
-		bool useNormalMap			{ true };
+		bool useFastCulling			{ true  };
+		bool useClipping			{ true  };
+		bool useNormalMap			{ true  };
 		bool visualizeDepthBuffer	{ false };
 		bool visualizeBoundingBox	{ false };
+		bool useMultiThreading		{ true  };
 	};
 
 	struct Bounds
@@ -174,66 +175,6 @@ namespace dae
 				out_code |= TOP;
 
 			return out_code;
-		}
-
-		// Clip the given line to the rect formed by the bounds
-		// https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
-		bool LineClip(Vector2& v0, Vector2& v1)
-		{
-			OutCode outcode0 = ComputeOutCode(v0);
-			OutCode outcode1 = ComputeOutCode(v1);
-			bool accept = false;
-
-			while (true) {
-				if (!(outcode0 | outcode1)) {
-					// bitwise OR is 0: both points inside window; trivially accept and exit loop
-					accept = true;
-					break;
-				}
-				else if (outcode0 & outcode1) {
-					// bitwise AND is not 0: both points share an outside zone (LEFT, RIGHT, TOP,
-					// or BOTTOM), so both must be outside window; exit loop (accept is false)
-					break;
-				}
-				else {
-					// failed both tests, so calculate the line segment to clip
-					// from an outside point to an intersection with clip edge
-					float x{}, y{};
-
-					// At least one endpoint is outside the clip rectangle; pick it.
-					OutCode outcodeOut = outcode1 > outcode0 ? outcode1 : outcode0;
-
-					// Now find the intersection point;
-					if (outcodeOut & TOP) {         // point is above the clip window
-						x = v0.x + (v1.x - v0.x) * (max.y - v0.y) / (v1.y - v0.y);
-						y = max.y;
-					}
-					else if (outcodeOut & BOTTOM) { // point is below the clip window
-						x = v0.x + (v1.x - v0.x) * (min.y - v0.y) / (v1.y - v0.y);
-						y = min.y;
-					}
-					else if (outcodeOut & RIGHT) {  // point is to the right of clip window
-						y = v0.y + (v1.y - v0.y) * (max.x - v0.x) / (v1.x - v0.x);
-						x = max.x;
-					}
-					else if (outcodeOut & LEFT) {   // point is to the left of clip window
-						y = v0.y + (v1.y - v0.y) * (min.x - v0.x) / (v1.x - v0.x);
-						x = min.x;
-					}
-
-					// Now we move outside point to intersection point to clip
-					// and get ready for next pass.
-					if (outcodeOut == outcode0) {
-						v0 = { x,y };
-						outcode0 = ComputeOutCode(v0);
-					}
-					else {
-						v1 = { x,y };
-						outcode1 = ComputeOutCode(v1);
-					}
-				}
-			}
-			return accept;
 		}
 	};
 }

@@ -52,6 +52,7 @@ namespace dae
 		void ToggleUniformClear();
 		void ToggleFPS();
 		void ToggleClipping();
+		void ToggleMultiThreading();
 	};
 
 	class ReferenceScene final : public Scene

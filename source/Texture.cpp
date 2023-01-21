@@ -71,6 +71,19 @@ namespace dae
 		return ColorRGB{ r * invResize , g * invResize, b * invResize };
 	}
 
+	Vector4 Texture::SampleRGBA(const Vector2& uv) const
+	{
+		const Uint32 px{ static_cast<Uint32>(std::clamp(uv.x, 0.f, 1.f) * m_pSurface->w) };
+		const Uint32 py{ static_cast<Uint32>(std::clamp(uv.y, 0.f, 1.f) * m_pSurface->h) };
+		const Uint32 pixelIndex{ static_cast<Uint32>(px + (py * m_pSurface->w)) };
+
+		Uint8 r, g, b, a;
+		SDL_GetRGBA(m_pSurfacePixels[pixelIndex], m_pSurface->format, &r, &g, &b, &a);
+
+		const float invResize = 1 / 255.f;
+		return Vector4{ r * invResize , g * invResize, b * invResize, a * invResize };
+	}
+
 	Vector3 Texture::SampleNormal(const Vector2& uv) const
 	{
 		const Uint32 px{ static_cast<Uint32>(std::clamp(uv.x, 0.f, 1.f) * m_pSurface->w) };

@@ -1,10 +1,8 @@
-﻿  Renderer.cpp
-  Scene.cpp
-  main.cpp
+﻿  Scene.cpp
   Generating code
-  11 of 1245 functions ( 0.9%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    28 functions had inline decision re-evaluated but remain unchanged
+  2 of 1377 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    4 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
 dx11effects.lib(EffectAPI.obj) : warning LNK4099: PDB '' was not found with 'dx11effects.lib(EffectAPI.obj)' or at ''; linking object as if no debug info
 dx11effects.lib(EffectNonRuntime.obj) : warning LNK4099: PDB '' was not found with 'dx11effects.lib(EffectNonRuntime.obj)' or at ''; linking object as if no debug info

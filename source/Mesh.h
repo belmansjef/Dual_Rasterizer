@@ -10,6 +10,11 @@ namespace dae
 	public:
 		Mesh() = default;
 		Mesh(ID3D11Device* pDevice, const std::vector<Vertex_In>& vertices, const std::vector<uint32_t>& indices);
+		
+		Mesh(const Mesh& other) noexcept;
+		Mesh& operator=(const Mesh& other) = delete;
+		Mesh(Mesh&& other) = default;
+		Mesh& operator=(Mesh&& other) = delete;
 
 		~Mesh();
 

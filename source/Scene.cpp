@@ -44,6 +44,9 @@ void dae::Scene::ProccesKeyInput(SDL_Event& e)
 	case SDL_SCANCODE_C:
 		ToggleClipping();
 		break;
+	case SDL_SCANCODE_X:
+		ToggleMultiThreading();
+		break;
 	}
 }
 
@@ -74,10 +77,11 @@ void dae::Scene::ToggleRotation()
 
 void dae::Scene::ToggleFireFX()
 {
-	if (m_RenderInfo.renderType != RenderType::Hardware) return;
 	m_RenderInfo.renderFireFX = !m_RenderInfo.renderFireFX;
 
-	SetConsoleTextAttribute(m_hConsole, 2);
+	m_pMeshes[1]->SetIsEnabled(m_RenderInfo.renderFireFX);
+
+	SetConsoleTextAttribute(m_hConsole, 13);
 	std::cout << "[FIRE FX] ";
 	m_RenderInfo.renderFireFX ? std::cout << "ON\n" : std::cout << "OFF\n";
 }
@@ -157,9 +161,19 @@ void dae::Scene::ToggleClipping()
 	if (m_RenderInfo.renderType != RenderType::Software) return;
 	m_RenderInfo.useClipping = !m_RenderInfo.useClipping;
 
-	SetConsoleTextAttribute(m_hConsole, 5);
+	SetConsoleTextAttribute(m_hConsole, 13);
 	std::cout << "[TRIANGLE CLIPPING] ";
 	m_RenderInfo.useClipping ? std::cout << "ON\n" : std::cout << "OFF\n";
+}
+
+void dae::Scene::ToggleMultiThreading()
+{
+	if (m_RenderInfo.renderType != RenderType::Software) return;
+	m_RenderInfo.useMultiThreading = !m_RenderInfo.useMultiThreading;
+
+	SetConsoleTextAttribute(m_hConsole, 13);
+	std::cout << "[MULTITHREADING] ";
+	m_RenderInfo.useMultiThreading ? std::cout << "ON\n" : std::cout << "OFF\n";
 }
 
 void dae::Scene::CycleFilteringMode()
@@ -218,10 +232,17 @@ void dae::ReferenceScene::Initialize(ID3D11Device* pDevice)
 		<< "-----------------------------------------------\n\n";
 
 	SetConsoleTextAttribute(m_hConsole, 6);
-	std::cout	
+	std::cout
 		<< "[Key Bindings - SHARED]\n"
 		<< "  [F1] Toggle Rasterizer Mode (HARDWARE/SOFTWARE)\n"
-		<< "  [F2] Toggle Vehicle Rotation (ON/OFF)\n"
+		<< "  [F2] Toggle Vehicle Rotation (ON/OFF)\n";
+
+	SetConsoleTextAttribute(m_hConsole, 13);
+	std::cout
+		<< "  [F3] (EXTRA: SOFTWARE) Toggle FireFX (ON/OFF)\n";
+
+	SetConsoleTextAttribute(m_hConsole, 6);
+	std::cout
 		<< "  [F9] Cycle CullMode (BACK/FRONT/NONE)\n"
 		<< "  [F10] Toggle Uniform ClearColor (ON/OFF)\n"
 		<< "  [F11] Toggle Print FPS (ON/OFF)\n"
@@ -230,7 +251,6 @@ void dae::ReferenceScene::Initialize(ID3D11Device* pDevice)
 	SetConsoleTextAttribute(m_hConsole, 2);
 	std::cout
 		<< "[Key Bindings - HARDWARE]\n"
-		<< "  [F3] Toggle FireFX (ON/OFF)\n"
 		<< "  [F4] Cycle Sampler State (POINT/LINEAR/ANISOTROPIC)\n"
 		<< std::endl;
 
@@ -244,6 +264,7 @@ void dae::ReferenceScene::Initialize(ID3D11Device* pDevice)
 	SetConsoleTextAttribute(m_hConsole, 13);
 	std::cout
 		<< "  [C] (EXTRA) Toggle Triangle Clipping (ON/OFF)\n"
+		<< "  [X] (EXTRA) Toggle MultiThreading (Vehicle only, disabled for FireFX due to artifacts) (ON/OFF)\n"
 		<< std::endl;
 
 
@@ -291,6 +312,10 @@ void dae::ReferenceScene::Initialize(ID3D11Device* pDevice)
 	m_pVehicleMesh->Translate({ 0.f, 0.f, 50.f });
 	m_pFireMesh->Translate({ 0.f, 0.f, 50.f });
 
+	// Set fire mesh cull mode to none for correct partial coverage
+	m_pFireMesh->SetCullMode(CullMode::None);
+	m_pFireEffect->SetCullMode(m_pFireMesh->GetCullMode());
+
 	// Add meshes to collection
 	m_pMeshes.push_back(m_pVehicleMesh);
 	m_pMeshes.push_back(m_pFireMesh);
@@ -303,10 +328,10 @@ void dae::ReferenceScene::Initialize(ID3D11Device* pDevice)
 void dae::ReferenceScene::Update(const Timer* pTimer, ID3D11Device* pDevice)
 {
 	// Call base class update
-	Scene::Update(pTimer, pDevice);
-	
-	// Disable FireMesh in software renderer
-	m_pFireMesh->SetIsEnabled(m_RenderInfo.renderType != RenderType::Software && m_RenderInfo.renderFireFX);
+	Scene::Update(pTimer, pDevice);	
+
+	// Set console color to light blue for FPS counter
+	SetConsoleTextAttribute(m_hConsole, 9);
 
 	// Set clear color
 	if (m_RenderInfo.useUniformClear) m_RenderInfo.clearColor = m_UniformClear;
