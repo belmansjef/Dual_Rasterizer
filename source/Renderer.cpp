@@ -120,10 +120,12 @@ namespace dae {
 			vert_out.normal = rotMatrix.TransformVector(verticesIn[i].normal);
 			vert_out.tangent = rotMatrix.TransformVector(verticesIn[i].tangent);
 
-			vert_out.viewDirection = worldMatrix.TransformPoint(vert_out.position) - camera.invViewMatrix[3];
+			// vert_out.viewDirection = worldMatrix.TransformPoint(vert_out.position) - camera.invViewMatrix[3];
 
 			// WORLD to NDC
 			vert_out.position = wvp.TransformPoint({ verticesIn[i].position, 1.f });
+			vert_out.viewDirection = Vector3{ vert_out.position.x, vert_out.position.y, vert_out.position.z };
+			vert_out.viewDirection.Normalize();
 
 			// Perspective divide
 			const float invDepth = 1.f / vert_out.position.w;
@@ -622,9 +624,8 @@ namespace dae {
 		if (renderInfo.useNormalMap)
 		{
 			const Vector3 binormal{ Vector3::Cross(vertex.normal, vertex.tangent) };
-			const Matrix tangent_space_axis{ vertex.tangent, binormal.Normalized(), vertex.normal, {0.f, 0.f, 0.f} };
-			sampled_normal = mesh.GetNormalMap()->SampleNormal(vertex.uv);
-			sampled_normal = 2.f * sampled_normal - Vector3{ 1.f, 1.f, 1.f };
+			const Matrix tangent_space_axis{ vertex.tangent, binormal, vertex.normal, {0.f, 0.f, 0.f} };
+			sampled_normal = 2.f * mesh.GetNormalMap()->SampleNormal(vertex.uv) - Vector3{ 1.f, 1.f, 1.f };
 			sampled_normal = tangent_space_axis.TransformVector(sampled_normal);
 		}
 
@@ -642,7 +643,7 @@ namespace dae {
 				const float exp{ mesh.GetGlossMap()->SampleColor(vertex.uv).r * shininess };
 				ColorRGB phong_color{ mesh.GetSpecularMap()->SampleColor(vertex.uv) * LightUtils::PhongSpecular(1.f, exp, lightDirection, vertex.viewDirection, sampled_normal) };
 
-				return (lambert_diffuse * lightIntensity + phong_color + ambient) * observed_area;
+				return (lambert_diffuse * lightIntensity + phong_color) * observed_area + ambient;
 			}
 			case dae::ShadingMode::ObservedArea:
 			{
@@ -660,7 +661,7 @@ namespace dae {
 			{
 				// Lambert
 				const ColorRGB lambert_diffuse{ (mesh.GetDiffuseMap()->SampleColor(vertex.uv) * kd) / PI };
-				return (lambert_diffuse + ambient);
+				return lambert_diffuse * lightIntensity * observed_area;
 			}
 		}
 

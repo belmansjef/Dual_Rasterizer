@@ -94,7 +94,7 @@ namespace dae
 					((verts[0].viewDirection / verts[0].position.w) * w0) +
 					((verts[1].viewDirection / verts[1].position.w) * w1) +
 					((verts[2].viewDirection / verts[2].position.w) * w2)
-				) * interpolatedViewSpaceDepth).Normalized()
+				) * interpolatedViewSpaceDepth)
 			};
 
 			return interpolatedVertex;

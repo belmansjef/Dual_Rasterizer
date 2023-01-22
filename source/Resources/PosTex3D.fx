@@ -17,10 +17,10 @@ DepthStencilState gDepthStencilState    : DEPTHSTENCIL_STATE;
 
 // Constants
 float4 gAmbient = { 0.025f, 0.025f, 0.025f, 0.0f };
-float3 gLightDirection = { 0.577f, -0.577f, 0.577f };
-float gLightIntensity = { 7.f };
-float gShininess = { 25.f };
-float gPI = { 3.14159265358979323846f };
+float3 gLightDirection = { .577f, -.577f, 0.577f };
+float gLightIntensity = 7.f;
+float gShininess = 25.f;
+float gPI = 3.14159265358979323846f;
 
 //----------------------------------------------
 //	Input/Output Structs
@@ -93,10 +93,10 @@ float4 PS(VS_OUTPUT input) : SV_TARGET
     
     // Phong Specular shading
     float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverseMatrix[3].xyz);
-    float exponent = mul(gGlossMap.Sample(gSampler, input.TexCoord).x, gShininess);
+    float exponent = mul(gGlossMap.Sample(gSampler, input.TexCoord).r, gShininess);
     float4 phongSpecular = mul(gSpecularMap.Sample(gSampler, input.TexCoord), Phong(1.f, exponent, gLightDirection, viewDirection, sampledNormal));
     
-    return mul(mul(diffuse, gLightIntensity) + phongSpecular + gAmbient, observedArea);
+    return mul(mul(diffuse, gLightIntensity) + phongSpecular, observedArea) + gAmbient;
 }
 
 //----------------------------------------------

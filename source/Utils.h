@@ -31,9 +31,9 @@ namespace dae
 	{
 		inline float PhongSpecular(float ks, float exp, const Vector3& l, const Vector3& v, const Vector3& n)
 		{
-			const Vector3 reflect = Vector3::Reflect(-l, n);
-			const float cos_angle = std::max(0.f, Vector3::Dot(reflect, v));
-			const float phong_specular = ks * powf(cos_angle, exp);
+			const Vector3 reflect{ Vector3::Reflect(-l, n) };
+			const float cos_angle{ std::max(0.f, Vector3::Dot(reflect, v)) };
+			const float phong_specular{ ks * powf(cos_angle, exp) };
 
 			return phong_specular;
 		}
